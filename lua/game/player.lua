@@ -232,7 +232,7 @@ end
 
 function Player:drop_object()
     if self.grabbed_object then
-        self.grabbed_object:stop_mouse_joint()
+        self.grabbed_object:stop_mouse_joint( self )
         self.grabbed_object = nil
         self.grabbed_object_rotated = nil
     end
@@ -383,8 +383,8 @@ function Player:draw()
     end
 
     --  drag visual
-    if self.grabbed_object and self.grabbed_object.mouse_joint and not self.grabbed_object.mouse_joint:isDestroyed() then
-        local self_x, self_y, x, y = self.grabbed_object.mouse_joint:getAnchors()
+    if self.grabbed_object and self.grabbed_object.cursor_joints[self] and not self.grabbed_object.cursor_joints[self]:isDestroyed() then
+        local self_x, self_y, x, y = self.grabbed_object.cursor_joints[self]:getAnchors()
 
         --  circles
         love.graphics.circle( "fill", self_x, self_y, line_space )

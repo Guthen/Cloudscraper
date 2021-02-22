@@ -12,6 +12,7 @@ PhysicsEntity.draw_shapes = {
     end,
 }
 
+PhysicsEntity.cursor_joints = {}
 PhysicsEntity.body = nil
 PhysicsEntity.shape = nil
 PhysicsEntity.fixture = nil
@@ -20,6 +21,7 @@ PhysicsEntity.world = nil
 function PhysicsEntity:init( world, x, y, type )
     self.world = world
     self.body = love.physics.newBody( world.world, x, y, type )
+    self.cursor_joints = {}
 
     PhysicsEntities[#PhysicsEntities + 1] = self
 end
@@ -44,18 +46,24 @@ function PhysicsEntity:edge( start_x, start_y, end_x, end_y )
 end
 
 function PhysicsEntity:start_mouse_joint( target, x, y )
-    if self.mouse_joint then
-        self:stop_mouse_joint()
+    if self.cursor_joints[target] then
+        self:stop_mouse_joint( target )
     end
 
-    self.mouse_joint = love.physics.newMouseJoint( self.body, x, y )
-    self.mouse_joint_target = target
+    self.cursor_joints[target] = love.physics.newMouseJoint( self.body, x, y )
+    --self.mouse_joint_target = target
 end
 
-function PhysicsEntity:stop_mouse_joint()
-    if self.mouse_joint and not self.mouse_joint:isDestroyed() then
-        self.mouse_joint:destroy()
-        self.mouse_joint = nil
+function PhysicsEntity:stop_mouse_joint( target )
+    if not target then
+        for target, joint in pairs( self.cursor_joints ) do
+            self:stop_mouse_joint( target )
+        end
+    else
+        if self.cursor_joints[target] and not self.cursor_joints[target]:isDestroyed() then
+            self.cursor_joints[target]:destroy()
+            self.cursor_joints[target] = nil
+        end
     end
 end
 
@@ -85,12 +93,8 @@ function PhysicsEntity:apply_force( fx, fy )
 end
 
 function PhysicsEntity:update( dt )
-    if self.mouse_joint then
-        --if self.mouse_joint.joystick then
-            self.mouse_joint:setTarget( Camera:get_world_pos( self.mouse_joint_target.x, self.mouse_joint_target.y ) )
-        --else
-            --self.mouse_joint:setTarget( self.mouse_joint_target.x, self.mouse_joint_target.y )
-        --end
+    for target, joint in pairs( self.cursor_joints ) do
+        joint:setTarget( Camera:get_world_pos( target.x, target.y ) )
     end
 end
 
