@@ -260,6 +260,14 @@ function Player:mouserelease( x, y, button )
     self:drop_object()
 end
 
+function Player:wheelmove( x, y )
+    if self.joystick then return end
+
+    local rot = y * love.timer.getDelta() * self.rotate_speed * 2
+    self.grabbed_object_rotated = true
+    self.grabbed_object.body:setAngle( self.grabbed_object.body:getAngle() + rot )
+end
+
 function Player:gamepadpress( joystick, button )
     if not ( joystick == self.joystick ) then return end
 
@@ -322,26 +330,28 @@ function Player:update( dt )
                 Camera:move( 0, y * Game.camera_speed * dt )
             end
 
-            --  object rotation
-            if self.grabbed_object and not self.grabbed_object.body:isDestroyed() then
-                local rot = 0
-                if self.joystick:isGamepadDown( "rightshoulder" ) then
-                    rot = rot + dt * self.rotate_speed
-                end
-                if self.joystick:isGamepadDown( "leftshoulder" ) then
-                    rot = rot - dt * self.rotate_speed
-                end
+        end
+        
+        --  object rotation
+        if self.grabbed_object and not self.grabbed_object.body:isDestroyed() then
+            local rot = 0
+            if self.joystick:isGamepadDown( "rightshoulder" ) then
+                rot = rot + dt * self.rotate_speed
+            end
+            if self.joystick:isGamepadDown( "leftshoulder" ) then
+                rot = rot - dt * self.rotate_speed
+            end
 
-                if not ( rot == 0 ) then
-                    self.grabbed_object_rotated = true
-                    self.grabbed_object.body:setAngle( self.grabbed_object.body:getAngle() + rot )
-                end
-
-                if self.grabbed_object_rotated then
-                    self.grabbed_object.body:setAngularVelocity( 0 )
-                end
+            if not ( rot == 0 ) then
+                self.grabbed_object_rotated = true
+                self.grabbed_object.body:setAngle( self.grabbed_object.body:getAngle() + rot )
             end
         end
+    end
+
+    --  grabbed object rotation
+    if self.grabbed_object_rotated then
+        self.grabbed_object.body:setAngularVelocity( 0 )
     end
 
     --  cursor
