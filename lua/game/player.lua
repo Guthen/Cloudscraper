@@ -357,6 +357,7 @@ function Player:update( dt )
     self.cursor_scale = Player.cursor_scale
 end
 
+local line_height, line_width, line_space = pixel_to_meter( 1 ), pixel_to_meter( 3 ), pixel_to_meter( 1.5 )
 function Player:draw()
     Camera:pop()
 
@@ -365,13 +366,26 @@ function Player:draw()
 
     Camera:push()
 
-    --  score line
     if class.instanceOf( love._scene, Game ) then
+        --  score line
         self.anim_score = lerp( love.timer.getDelta() * 5, self.anim_score or 0, self:get_score() )
-        local line_height, line_width, line_space = pixel_to_meter( 1 ), pixel_to_meter( 3 ), pixel_to_meter( 1.5 )
         for x = 0, SCR_W, line_width + line_space do
             love.graphics.rectangle( "fill", x + ( love.timer.getTime() * 25 ) % ( line_width + line_space ) - line_width, math.min( self.anim_score, SCR_H - PX * 2 ) - line_height / 2, line_width, line_height )
         end
+    end
+
+    --  drag visual
+    if self.grabbed_object and self.grabbed_object.mouse_joint and not self.grabbed_object.mouse_joint:isDestroyed() then
+        local self_x, self_y, x, y = self.grabbed_object.mouse_joint:getAnchors()
+
+        --  circles
+        love.graphics.circle( "fill", self_x, self_y, line_space )
+        love.graphics.circle( "fill", x, y, line_space )
+
+        --  line
+        love.graphics.setLineWidth( line_height )
+        love.graphics.line( self_x, self_y, x, y )
+        love.graphics.setLineWidth( 1 )
     end
 end
 
