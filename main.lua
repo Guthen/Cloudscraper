@@ -34,6 +34,7 @@ require "lua.*"
 function love.load()
     love.graphics.setFont( Fonts.NORMAL )
     love.window.setMode( SCR_W, SCR_H )
+    love.window.setTitle( "Cloudscraper" )
     love.graphics.setBackgroundColor( rgb( 36, 159, 222 ) )
 
     math.randomseed( os.time() )
@@ -84,6 +85,18 @@ end
 
 function love.gamepadreleased( joystick, button )
     GameObjects.call( "gamepadrelease", joystick, button )
+end
+
+--[[ function love.joystickadded( joystick )
+    Player( joystick )
+    print( "New player:", joystick )
+end ]]
+
+function love.joystickremoved( joystick )
+    local player = Player.by_joystick( joystick )
+    if player then
+        player:destroy()
+    end
 end
 
 function love.wheelmoved( x, y )

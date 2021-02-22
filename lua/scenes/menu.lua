@@ -37,6 +37,7 @@ function Menu:init()
             end
         end
     end
+    self.panel = panel
 
     --  buttons
     local i = 0
@@ -150,6 +151,17 @@ end
 function Menu:keypress( key )
     if key == "escape" then
         love.event.quit( 1 )
+    elseif key == "space" then
+        if not Player.by_joystick() then
+            Player()
+        end
+    end
+end
+
+function Menu:gamepadpress( joystick, button )
+    if button == "start" and not Player.by_joystick( joystick ) then
+        Player( joystick ):set_nav_mode( self.panel.children[1] )
+        joystick:setVibration( .3, .3, .2 )
     end
 end
 

@@ -289,20 +289,22 @@ function Player:update( dt )
         self.x, self.y = love.mouse.getPosition()
 
         --  camera movement
-        local y = 0
-        if love.keyboard.isDown( "z" ) then
-            y = y - 1
-        end
-        if love.keyboard.isDown( "s" ) then
-            y = y + 1
-        end
+        if class.instanceOf( love._scene, Game ) then
+            local y = 0
+            if love.keyboard.isDown( "z" ) then
+                y = y - 1
+            end
+            if love.keyboard.isDown( "s" ) then
+                y = y + 1
+            end
 
-        local speed = dt * Game.camera_speed
-        Camera:move( 0, y * speed )
+            local speed = dt * Game.camera_speed
+            Camera:move( 0, y * speed )
+        end
     --  gamepad
     else
         --  cursor movement
-        local x, y = self.joystick:getAxis( 1 ), round( self.joystick:getAxis( 2 ), 1 )
+        local x, y = self.joystick:getGamepadAxis( "leftx" ), round( self.joystick:getGamepadAxis( "lefty" ), 1 )
         if x > -0.1 and x < 0.1 then
             x = 0
         end
@@ -310,32 +312,34 @@ function Player:update( dt )
         self.y = clamp( self.y + y * self.joystick_sensibility, 0, SCR_H )
 
         --  camera movement
-        local y = self.joystick:getAxis( 5 )
-        if y > -0.1 and y < 0.1 then
-            y = 0
-        end
-
-        if not ( y == 0 ) then
-            Camera:move( 0, y * Game.camera_speed * dt )
-        end
-
-        --  object rotation
-        if self.grabbed_object and not self.grabbed_object.body:isDestroyed() then
-            local rot = 0
-            if self.joystick:isGamepadDown( "rightshoulder" ) then
-                rot = rot + dt * self.rotate_speed
-            end
-            if self.joystick:isGamepadDown( "leftshoulder" ) then
-                rot = rot - dt * self.rotate_speed
+        if class.instanceOf( love._scene, Game ) then
+            local y = self.joystick:getGamepadAxis( "righty" )
+            if y > -0.1 and y < 0.1 then
+                y = 0
             end
 
-            if not ( rot == 0 ) then
-                self.grabbed_object_rotated = true
-                self.grabbed_object.body:setAngle( self.grabbed_object.body:getAngle() + rot )
+            if not ( y == 0 ) then
+                Camera:move( 0, y * Game.camera_speed * dt )
             end
 
-            if self.grabbed_object_rotated then
-                self.grabbed_object.body:setAngularVelocity( 0 )
+            --  object rotation
+            if self.grabbed_object and not self.grabbed_object.body:isDestroyed() then
+                local rot = 0
+                if self.joystick:isGamepadDown( "rightshoulder" ) then
+                    rot = rot + dt * self.rotate_speed
+                end
+                if self.joystick:isGamepadDown( "leftshoulder" ) then
+                    rot = rot - dt * self.rotate_speed
+                end
+
+                if not ( rot == 0 ) then
+                    self.grabbed_object_rotated = true
+                    self.grabbed_object.body:setAngle( self.grabbed_object.body:getAngle() + rot )
+                end
+
+                if self.grabbed_object_rotated then
+                    self.grabbed_object.body:setAngularVelocity( 0 )
+                end
             end
         end
     end
@@ -382,7 +386,9 @@ function Player:destroy( is_reset )
     --  reattribute id
     local id = 1
     for k, v in pairs( Players ) do
+        v.color = PlayerColors[id]
         v.player_id = id
         id = id + 1
     end
+    Player.player_id = id
 end
