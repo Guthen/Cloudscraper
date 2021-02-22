@@ -170,6 +170,7 @@ function Menu:draw()
     draw_outlined_text( "Cloudscraper", Fonts.ENORMOUS, button_wide / 15, button_height * .5 + button_tall * 1.5, limit, "left", WHITE, 1 )
     
     
+    draw_outlined_text( VERSION, Fonts.NORMAL, 16, SCR_H, limit, "left", WHITE, 1 )
     draw_outlined_text( "Guthen @2021", Fonts.NORMAL, SCR_W - button_wide * .01, SCR_H, limit, "right", WHITE, 1 )
 end
 

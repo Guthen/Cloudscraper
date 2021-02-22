@@ -262,6 +262,7 @@ end
 
 function Player:wheelmove( x, y )
     if self.joystick then return end
+    if not self.grabbed_object then return end
 
     local rot = y * love.timer.getDelta() * self.rotate_speed * 2
     self.grabbed_object_rotated = true
