@@ -14,6 +14,7 @@ function Game:init( gm_id )
     --  load gamemode
     self.gm = Gamemodes[gm_id]()
     self.gm.game = self
+    self.gm_id = gm_id
 
     --  init
     self.scoring_players = {}
@@ -49,18 +50,6 @@ function Game:init( gm_id )
 
     print( "Max Height: " .. self.max_height, "Clouds Height: " .. Cloud.height, "N-Clouds: " .. max_clouds )
 
-    --  init players
-    --[[ Player.reset()
-    for i, v in ipairs( love.joystick.getJoysticks() ) do
-        Player( v )
-    end
-    if #Players == 0 then
-        Player()
-    end
-    Player() ]]
-    --[[ Player()
-    Player() ]]
-
     --  re-add players
     for i, v in ipairs( Players ) do
         GameObjects.add( v )
@@ -91,6 +80,7 @@ function Game:init( gm_id )
     PhysicsEntity( self.world, 0, -self.max_height + SCR_H - diff ):edge( 0, 0, SCR_W, 0 ) --  top
 
     --  bind camera map bounds
+    Camera:reset()
     Camera.bounds.min_x = 0 
     Camera.bounds.min_y = -self.max_height + SCR_H
     Camera.bounds.max_x = SCR_W
@@ -141,6 +131,16 @@ end
 function Game:keypress( key )
     if key == "escape" then
         love.setScene( Menu )
+    elseif key == "space" and self.winner then
+        love.setScene( Game, self.gm_id )
+    end
+end
+
+function Game:gamepadpress( joystick, button )
+    if button == "start" then
+        love.setScene( Menu )
+    elseif button == "x" and self.winner then
+        love.setScene( Game, self.gm_id )
     end
 end
 
@@ -192,7 +192,7 @@ function Game:draw()
 
         draw_outlined_text( ( "Player %d wins!" ):format( self.winner.player_id ), Fonts.BIG, SCR_W / 2, SCR_H / 2, limit, "center", self.winner.color, self.text_scale )
         if round( love.timer.getTime() * 1.5, 0 ) % 2 == 0 then
-            draw_outlined_text( ( "Press START to quit the party." ), Fonts.BIG, SCR_W / 2, SCR_H / 2 + Fonts.BIG:getHeight() / 2, limit * 2, "center", WHITE, self.text_scale / 2 )
+            draw_outlined_text( ( "Press START to quit the party.\nPress SPACE to restart." ), Fonts.BIG, SCR_W / 2, SCR_H / 2 + Fonts.BIG:getHeight() * .75, limit * 2, "center", WHITE, self.text_scale / 2 )
         end
     else
         local limit = 300

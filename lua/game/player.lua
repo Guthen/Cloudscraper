@@ -277,8 +277,6 @@ function Player:gamepadpress( joystick, button )
         if class.instanceOf( love._scene, Game ) then
             self:set_nav_mode( not self.joystick_nav_mode and self.panel and self.panel.children[1] )
         end
-    elseif button == "start" and class.instanceOf( love._scene, Game ) then
-        love.setScene( Menu )
     end
 end
 
@@ -331,7 +329,7 @@ function Player:update( dt )
             end
 
         end
-        
+
         --  object rotation
         if self.grabbed_object and not self.grabbed_object.body:isDestroyed() then
             local rot = 0
@@ -344,7 +342,7 @@ function Player:update( dt )
 
             if not ( rot == 0 ) then
                 self.grabbed_object_rotated = true
-                self.grabbed_object.body:setAngle( self.grabbed_object.body:getAngle() + rot )
+                self.grabbed_object.body:setAngle( self.grabbed_object.body:getAngle() + rot / 2 )
             end
         end
     end
