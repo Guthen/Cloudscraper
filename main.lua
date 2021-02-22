@@ -14,6 +14,8 @@ Fonts = {
     ENORMOUS = love.graphics.newFont( "assets/fonts/vkx_pixel.ttf", 140 ),
 }
 
+VERSION = "v1.1.0"
+
 function pixel_to_meter( px )
     return px * PX / TEXTURE_SIZE
 end
